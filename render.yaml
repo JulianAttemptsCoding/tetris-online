@@ -2,8 +2,11 @@ services:
   - type: web
     name: tetris-online
     runtime: node
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
     plan: free
-    buildCommand: npm ci
-    startCommand: npm start
-    healthCheckPath: /
+    buildCommand: npm ci && npm run build
+    startCommand: node server.js
+    healthCheckPath: /health
     autoDeployTrigger: commit

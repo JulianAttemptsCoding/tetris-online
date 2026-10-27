@@ -5,17 +5,24 @@
   "description": "A small NES-inspired Tetris game for solo, LAN, and web play.",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "test": "node --test"
+    "dev": "npm start",
+    "test": "node --test test/*.test.js",
+    "build": "node build.js",
+    "prestart": "npm run build",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "express": "^4.21.2",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "trystero": "0.25.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "devDependencies": {
-    "jsdom": "^26.1.0"
+    "@playwright/test": "^1.64.1",
+    "esbuild": "^0.28.2",
+    "jsdom": "^26.1.0",
+    "socket.io-client": "^4.8.4"
   }
 }
