@@ -1,40 +1,47 @@
-# NES Tetris — Friends
+# Tetris — Friends
 
-A small browser falling-block game with NES-inspired timing, solo play, touch controls, and live rooms for friends. Multiplayer is a shared score chase: everyone plays their own board and can watch the others. It does not send garbage attacks or synchronize match starts.
+[Play online](https://julianattemptscoding.github.io/tetris-online/)
 
-[Play on GitHub Pages](https://julianattemptscoding.github.io/tetris-online/)
+A modern falling-block game targeting the Tetris.com desktop Marathon rules and observed level timings. Play solo or share a score-chasing room with friends. It replaces the earlier NES-inspired engine.
 
-## Run locally or on your LAN
+Features include hold, three next previews, ghost projection, seven-piece bags, SRS wall kicks, soft/hard drop, lock delay and placement limits, T-spins, combos, back-to-back and perfect-clear scoring, levels 1–30, selectable starts at levels 1–25, a countdown, local high scores, touch buttons/gestures, rebindable keys, fullscreen, and optional synthesized sound/music.
 
-Use Node.js 22 or newer:
+**Verified timing tables, sources, tests, and remaining parity limits: [RULES.md](RULES.md).** Numerical keyboard timing and level settings were read from the actual official desktop build; exhaustive equivalence with its smart mouse behavior and rendering is not claimed.
+
+## Run
+
+Node.js 22 or newer:
 
 ```sh
 npm ci
 npm start
 ```
 
-Open `http://localhost:3000`. On the same Wi-Fi, share `http://YOUR-COMPUTER-IP:3000`; players enter the same room code. Allow Node through your firewall if needed. Set `PORT` to change the listening port. `npm start` builds the peer library first; the server listens on all network interfaces.
+Open `http://localhost:3000`. On the same Wi-Fi, share `http://YOUR-COMPUTER-IP:3000` and join the same room. Allow Node through the firewall if needed. The service listens on all interfaces; `PORT` changes its port.
 
-## Play
+## Controls
 
-- Click **Start**. Arrow keys move and soft-drop; **X** rotates clockwise and **Z** counterclockwise.
-- Touch buttons support taps, held movement, soft drop, and both rotation directions.
-- **Settings** lets you rebind keys; duplicate bindings swap. Preferences are saved locally when browser storage is available.
-- **Pause** stops the simulation. Switching tabs, losing window focus, or opening Settings pauses automatically; click **Resume** to continue.
-- **Restart** starts a fresh game. There is no hold, hard drop, ghost piece, or wall kick.
-- Enter your name and a room code, then click **Join Room**. **Copy Link** creates a URL that pre-fills the code for friends; **Leave** returns to solo play.
+| Action                       | Default             |
+| ---------------------------- | ------------------- |
+| Move                         | Left / right arrows |
+| Clockwise / counterclockwise | Up arrow / Z        |
+| Soft drop                    | Down arrow          |
+| Hard drop                    | Space               |
+| Hold                         | C                   |
+| Pause                        | Escape              |
 
-The engine uses a 60.0988 Hz fixed simulation, the NES gravity curve, 16-frame movement delay with six-frame repeats, immediate locking on a blocked downward step, entry and line-clear delays, and classic line scoring. Scoring uses the level before a clear, then advances the level every ten lines. This is an NES-inspired browser implementation, not a cycle-accurate emulator. No Nintendo assets or ROMs are included.
+X and Shift are additional default rotate/hold aliases. Settings support rebinding, ghost/grid visibility, sound/music, and optional mouse controls. Switching tabs, losing focus, or opening Settings pauses the game. Restart begins a fresh countdown. Local best/five high scores and preferences use browser storage when available.
 
-## Multiplayer hosting
+Click **Join Room** after entering a name and code. **Copy Link** pre-fills that code for friends; **Leave** returns to solo play. Everyone plays their own board and watches the others. There are no garbage attacks or synchronized match starts.
 
-**Node hosting / LAN:** Socket.IO runs alongside the static site. Rooms support up to eight players, remove disconnected players, and automatically rejoin after a connection recovers. Board messages are validated and broadcasts are rate limited. A restart clears in-memory rooms; connected clients recreate membership when they reconnect. The server relays client-reported boards and scores, so this is casual play rather than a cheat-resistant ranked service.
+## Hosting
 
-**GitHub Pages:** The deployment bundles pinned Trystero 0.25.0 locally and uses its real WebRTC API with public Nostr signaling relays. No runtime CDN import or separate application server is needed. A room is waiting until another peer actually connects. Relay outages, restrictive firewalls, and some NAT configurations can prevent peer connections; use the Node deployment for those networks. Different transports have separate rooms: friends must use the same hosted URL. Room codes identify shared rooms; they are not passwords.
+- **GitHub Pages:** The workflow builds pinned Trystero 0.25.0 locally, tests the game, and deploys the static site. WebRTC peers connect through public Nostr signaling. Some networks/relay outages prevent peer connections; use Node hosting in that case.
+- **Node / LAN:** Socket.IO serves up to eight players per room, validates boards/scores, rate limits state updates, removes disconnected players, and rejoins after recovery. `/health` is the health check. State is in memory and scores are client-reported, for casual play.
+- **Render:** Connect the repository as a Blueprint with `render.yaml`. The build produces the peer bundle and starts the Node service. Use one service instance; scaling requires a shared room store/Socket.IO adapter.
+- **Docker:** `docker build -t tetris-online .` then `docker run --rm -p 3000:3000 tetris-online`. CI verifies image build, container health, and asset serving; the runtime uses a non-root user.
 
-**Render:** Connect this repository as a Blueprint using `render.yaml`. It builds the static peer bundle and starts the same Node service. `/health` supplies the health check. Use one service instance; multi-instance scaling would require shared room state and a Socket.IO adapter.
-
-**Docker:** `docker build -t tetris-online .` then `docker run --rm -p 3000:3000 tetris-online`. The multi-stage image builds assets, removes development dependencies, and runs as a non-root user.
+Friends must use the same hosted URL/transport. Room codes identify shared rooms and are not passwords.
 
 ## Verification
 
@@ -47,28 +54,23 @@ npm run test:e2e
 npm audit
 ```
 
-Unit and integration tests cover gravity, repeat timing, rotations and collisions, locking, line clears, level-boundary scoring, game over, settings, malformed messages, room switching, disconnects, and capacity limits. Chromium tests cover desktop controls, two actual Socket.IO clients, active-piece rendering, mobile taps/layout, and importing the real peer bundle. CI runs those checks before GitHub Pages deployment.
+Engine tests check the observed timing boundaries at every level, plus countdown, repeat delay, lock placement budget, seven-piece bags, SRS kicks/collisions, hold, scoring, line settlement, top-out, and level 30 completion. Browser tests check desktop/mobile controls, persistence, modern actions, real Socket.IO clients, and reconnects.
 
-The live WebRTC smoke test uses public relays and is opt-in so relay availability does not make CI nondeterministic:
+Live WebRTC is tested separately because public relay availability is nondeterministic:
 
 ```powershell
 $env:LIVE_PEER_TEST = '1'
 npx playwright test e2e/peer.spec.js
 ```
 
-On macOS/Linux: `LIVE_PEER_TEST=1 npx playwright test e2e/peer.spec.js`.
+macOS/Linux: `LIVE_PEER_TEST=1 npx playwright test e2e/peer.spec.js`.
 
 ## References and credits
 
-Reviewed on October 26, 2026. Stars are approximate popularity signals; suitability was also checked against source, license, API documentation, and executable tests.
+- [Official Tetris.com desktop game](https://play.tetris.com/play-now): behavioral and numerical reference, inspected October 27, 2026. No official source code or assets are redistributed. See [RULES.md](RULES.md) for the build and observations.
+- [dmotz/trystero](https://github.com/dmotz/trystero), approximately 2.8k stars, MIT: actual pinned WebRTC dependency, bundled locally with license notices.
+- [ovidiuch/flatris](https://github.com/ovidiuch/flatris), approximately 1.5k stars, MIT: reviewed room subscriptions, reconnects, and separation of active pieces from settled cells. Architectural reference, not vendored.
+- [jakesgordon/javascript-tetris](https://github.com/jakesgordon/javascript-tetris), 737 stars, MIT: reviewed canvas rendering, collision checks, and animation-frame handling. Comparison reference, not vendored.
+- [chvin/react-tetris](https://github.com/chvin/react-tetris), approximately 8.7k stars: UX overview only; no license was identified and no code/assets were copied.
 
-| Repository                                                                        | Stars observed | License               | How it is used                                                                                                                                                                                                                       |
-| --------------------------------------------------------------------------------- | -------------: | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [dmotz/trystero](https://github.com/dmotz/trystero)                               |           2.8k | MIT                   | Actual pinned dependency powering Pages rooms. Followed its documented `joinRoom`, `makeAction`, `onMessage`, peer lifecycle, and targeted-send API. Bundled locally with its license notices.                                       |
-| [ovidiuch/flatris](https://github.com/ovidiuch/flatris)                           |           1.5k | MIT                   | Reviewed `server/socket.js` and `shared/reducers/game.js` for room subscriptions, reconnect behavior, and separation of falling pieces from settled cells. Architectural reference; its React/server implementation is not vendored. |
-| [jakesgordon/javascript-tetris](https://github.com/jakesgordon/javascript-tetris) |            737 | MIT                   | Reviewed its canvas renderer, collision checks, line clearing, and capped animation-frame loop. Reference for comparison; this project retains its own NES-inspired engine.                                                          |
-| [chvin/react-tetris](https://github.com/chvin/react-tetris)                       |           8.7k | No license identified | Reviewed the project overview for desktop/mobile UX. No code or assets copied.                                                                                                                                                       |
-
-Source snapshots reviewed: Flatris `c01772a90af5149124aa2ba6099a6e658d344137`, Jake Gordon Tetris `e5c0c42f7dac0f3514a55eff656c6e22e95d68ed`. Trystero integration is pinned in `package-lock.json`.
-
-Trystero and its bundled dependencies retain their copyright/license notices in `public/vendor/` after building. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Tetris is a trademark of its respective owners; this project is unaffiliated.
+Star counts were checked October 26, 2026. Popularity was considered alongside source quality, API compatibility, and licenses. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). No ROMs or Nintendo assets are included. Tetris is a trademark of its respective owners; this independent fan project is unaffiliated.

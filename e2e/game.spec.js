@@ -13,6 +13,7 @@ test("desktop controls, settings, typing, and pause work without browser errors"
   await page.goto("/");
   await expect(page.locator("#gameStatus")).toHaveText("PRESS START");
   await page.locator("#start").click();
+  await expect(page.locator("#gameStatus")).toBeHidden({ timeout: 5000 });
   await page.keyboard.press("x");
   expect(
     await page.evaluate(() => window.__tetrisTest.snapshot().piece.rotation),
@@ -48,6 +49,7 @@ test("two browsers join, see active boards, switch rooms, and leave", async ({
   await expect(a.locator(".player")).toHaveCount(2);
   await expect(b.locator(".player")).toHaveCount(2);
   await b.locator("#start").click();
+  await expect(b.locator("#gameStatus")).toBeHidden({ timeout: 5000 });
   await expect(a.locator("#players")).toContainText("Bob — 0 · PLAYING");
   // A falling piece is visible before any piece has locked.
   expect(
@@ -88,6 +90,7 @@ test("mobile fits the viewport and pointer controls move and rotate", async ({
   });
   await page.goto("/");
   await page.locator("#start").click();
+  await expect(page.locator("#gameStatus")).toBeHidden({ timeout: 5000 });
   await page.locator('[data-touch="rotateCW"]').tap();
   const state = await page.evaluate(() => window.__tetrisTest.snapshot());
   expect(state.piece.rotation).toBe(1);
@@ -126,6 +129,7 @@ test("solo loop keeps running while multiplayer script loads slowly", async ({
   });
   await page.goto("/");
   await page.locator("#start").click();
+  await expect(page.locator("#gameStatus")).toBeHidden({ timeout: 5000 });
   await page.keyboard.down("ArrowDown");
   await expect
     .poll(() => page.evaluate(() => window.__tetrisTest.snapshot().piece.y))
@@ -155,4 +159,78 @@ test("browser automatically rejoins its room after network loss", async ({
   } finally {
     await context.close();
   }
+});
+
+test("modern hold, hard drop, ghost settings, high scores, and level selection work", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/");
+  await page.locator("#start").click();
+  await expect(page.locator("#gameStatus")).toBeHidden({ timeout: 5000 });
+  const first = await page.evaluate(
+    () => window.__tetrisTest.snapshot().piece.type,
+  );
+  await page.keyboard.press("c");
+  expect(
+    await page.evaluate(() => window.__tetrisTest.snapshot().holdType),
+  ).toBe(first);
+  await page.keyboard.press("Space");
+  expect(
+    await page.evaluate(() => window.__tetrisTest.snapshot().placedCount),
+  ).toBe(1);
+  expect(
+    await page.evaluate(() => window.__tetrisTest.snapshot().score),
+  ).toBeGreaterThan(0);
+  await page.locator("#settings").click();
+  await page.locator('[data-option="ghost"]').uncheck();
+  await page.locator('[data-option="sound"]').check();
+  await page.locator('[data-option="music"]').check();
+  await page.locator("#startLevel").selectOption("20");
+  await page.locator("#start").click();
+  await expect(page.locator("#gameStatus")).toBeHidden({ timeout: 5000 });
+  await expect
+    .poll(() => page.evaluate(() => window.__tetrisTest.snapshot().piece?.y))
+    .toBeGreaterThan(10);
+  await page.locator("#settings").click();
+  await expect(page.locator('[data-option="ghost"]')).not.toBeChecked();
+  await expect(page.locator("#level")).toHaveText("20");
+  await page.locator(".highScorePanel summary").click();
+  await expect(page.locator("#highScores li")).toHaveCount(1);
+  await page.screenshot({
+    path: "test-results/modern-desktop.png",
+    fullPage: true,
+  });
+  expect(errors).toEqual([]);
+});
+
+test("optional mouse controls position, hold, and hard-drop the piece", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/");
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#gameStatus")).toBeHidden({ timeout: 5000 });
+  await page.locator("#settings").click();
+  await page.locator('[data-option="mouse"]').check();
+  await page.locator("#settings").click();
+  await page.locator("#pause").click();
+  const box = await page.locator("#board").boundingBox();
+  await page.mouse.move(box.x + box.width * 0.25, box.y + box.height * 0.25);
+  expect(
+    await page.evaluate(() => window.__tetrisTest.snapshot().piece.x),
+  ).toBeLessThan(3);
+  await page.mouse.click(box.x + box.width * 0.25, box.y + box.height * 0.25, {
+    button: "right",
+  });
+  expect(
+    await page.evaluate(() => window.__tetrisTest.snapshot().holdType),
+  ).not.toBeNull();
+  await page.mouse.click(box.x + box.width * 0.25, box.y + box.height * 0.25);
+  expect(
+    await page.evaluate(() => window.__tetrisTest.snapshot().placedCount),
+  ).toBe(1);
+  expect(errors).toEqual([]);
 });

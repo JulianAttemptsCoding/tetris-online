@@ -76,7 +76,7 @@ function createGameServer() {
         !validBoard(data.board) ||
         !Number.isInteger(data.score) ||
         data.score < 0 ||
-        data.score > 999999
+        data.score > Number.MAX_SAFE_INTEGER
       )
         return;
       const now = Date.now();
@@ -84,9 +84,13 @@ function createGameServer() {
       socket.data.lastState = now;
       player.board = data.board;
       player.score = data.score;
-      player.status = ["READY", "PLAYING", "PAUSED", "GAME OVER"].includes(
-        data.status,
-      )
+      player.status = [
+        "READY",
+        "PLAYING",
+        "PAUSED",
+        "GAME OVER",
+        "COMPLETE",
+      ].includes(data.status)
         ? data.status
         : "PLAYING";
       broadcast(socket.data.room);

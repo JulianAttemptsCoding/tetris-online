@@ -16,11 +16,15 @@ function networkState() {
     score,
     status: paused
       ? "PAUSED"
-      : running
-        ? "PLAYING"
-        : gameMessage === "GAME OVER"
-          ? "GAME OVER"
-          : "READY",
+      : engine.countdown
+        ? "READY"
+        : engine.completed
+          ? "COMPLETE"
+          : running
+            ? "PLAYING"
+            : engine.message === "GAME OVER"
+              ? "GAME OVER"
+              : "READY",
   };
 }
 const validBoard = (value) =>
@@ -114,7 +118,7 @@ async function connectPeerRoom() {
         !validBoard(data.board) ||
         !Number.isInteger(data.score) ||
         data.score < 0 ||
-        data.score > 999999
+        data.score > Number.MAX_SAFE_INTEGER
       )
         return;
       if (!peerPlayers.has(peerId) && peerPlayers.size >= 8) return;
@@ -238,7 +242,7 @@ function showPlayers(players) {
       card = { element, label, context };
       playerCards.set(player.id, card);
     }
-    card.label.textContent = `${String(player.name || "Player").slice(0, 16)} — ${Number(player.score) || 0} · ${["READY", "PLAYING", "PAUSED", "GAME OVER"].includes(player.status) ? player.status : "READY"}`;
+    card.label.textContent = `${String(player.name || "Player").slice(0, 16)} — ${Number(player.score) || 0} · ${["READY", "PLAYING", "PAUSED", "GAME OVER", "COMPLETE"].includes(player.status) ? player.status : "READY"}`;
     card.context.fillStyle = "#020817";
     card.context.fillRect(0, 0, COLS, ROWS);
     if (validBoard(player.board))
@@ -255,21 +259,14 @@ function showPlayers(players) {
 document.querySelectorAll("[data-touch]").forEach((button) => {
   const release = () => {
     const action = button.dataset.touch;
-    if (action in held) held[action] = false;
+    releaseAction(action);
   };
   button.addEventListener("pointerdown", (event) => {
     event.preventDefault();
     if (!running || paused) return;
     button.setPointerCapture?.(event.pointerId);
     const action = button.dataset.touch;
-    if (action in held) {
-      held[action] = true;
-      if (action === "left" || action === "right") {
-        dasDirection = action === "left" ? -1 : 1;
-        dasFrames = 0;
-        shift(dasDirection);
-      }
-    } else rotate(action === "rotateCW" ? 1 : -1);
+    pressAction(action);
   });
   for (const event of ["pointerup", "pointercancel", "lostpointercapture"])
     button.addEventListener(event, release);

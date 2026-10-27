@@ -39,6 +39,7 @@ test("real WebRTC peers exchange boards through public signaling", async ({
     for (const page of pages)
       await expect(page.locator(".player")).toHaveCount(2, { timeout: 45000 });
     await pages[1].locator("#start").click();
+    await expect(pages[1].locator("#gameStatus")).toBeHidden({ timeout: 5000 });
     await expect(pages[0].locator("#players")).toContainText(
       "Bob — 0 · PLAYING",
     );

@@ -1,0 +1,195 @@
+{
+  "source": "https://play.tetris.com/play-now",
+  "build": "62B1EB587D30B208",
+  "checkedAt": "2026-10-27",
+  "das": 170,
+  "arr": 50,
+  "countdown": 2000,
+  "previews": 3,
+  "softDropFactor": 20,
+  "resetLimit": 15,
+  "clear": 200,
+  "collapse": 50,
+  "levels": [
+    {
+      "level": 1,
+      "entry": 50,
+      "fall": 1000,
+      "lock": 500
+    },
+    {
+      "level": 2,
+      "entry": 50,
+      "fall": 793,
+      "lock": 500
+    },
+    {
+      "level": 3,
+      "entry": 50,
+      "fall": 618,
+      "lock": 500
+    },
+    {
+      "level": 4,
+      "entry": 50,
+      "fall": 473,
+      "lock": 500
+    },
+    {
+      "level": 5,
+      "entry": 50,
+      "fall": 355,
+      "lock": 500
+    },
+    {
+      "level": 6,
+      "entry": 50,
+      "fall": 262,
+      "lock": 500
+    },
+    {
+      "level": 7,
+      "entry": 50,
+      "fall": 190,
+      "lock": 500
+    },
+    {
+      "level": 8,
+      "entry": 50,
+      "fall": 135,
+      "lock": 500
+    },
+    {
+      "level": 9,
+      "entry": 50,
+      "fall": 94,
+      "lock": 500
+    },
+    {
+      "level": 10,
+      "entry": 50,
+      "fall": 64,
+      "lock": 500
+    },
+    {
+      "level": 11,
+      "entry": 50,
+      "fall": 43,
+      "lock": 500
+    },
+    {
+      "level": 12,
+      "entry": 50,
+      "fall": 28,
+      "lock": 500
+    },
+    {
+      "level": 13,
+      "entry": 50,
+      "fall": 18,
+      "lock": 500
+    },
+    {
+      "level": 14,
+      "entry": 50,
+      "fall": 11,
+      "lock": 500
+    },
+    {
+      "level": 15,
+      "entry": 50,
+      "fall": 7,
+      "lock": 500
+    },
+    {
+      "level": 16,
+      "entry": 50,
+      "fall": 4,
+      "lock": 500
+    },
+    {
+      "level": 17,
+      "entry": 50,
+      "fall": 3,
+      "lock": 500
+    },
+    {
+      "level": 18,
+      "entry": 50,
+      "fall": 2,
+      "lock": 500
+    },
+    {
+      "level": 19,
+      "entry": 50,
+      "fall": 1,
+      "lock": 500
+    },
+    {
+      "level": 20,
+      "entry": 47,
+      "fall": 0,
+      "lock": 450
+    },
+    {
+      "level": 21,
+      "entry": 43,
+      "fall": 0,
+      "lock": 400
+    },
+    {
+      "level": 22,
+      "entry": 40,
+      "fall": 0,
+      "lock": 350
+    },
+    {
+      "level": 23,
+      "entry": 35,
+      "fall": 0,
+      "lock": 300
+    },
+    {
+      "level": 24,
+      "entry": 30,
+      "fall": 0,
+      "lock": 250
+    },
+    {
+      "level": 25,
+      "entry": 25,
+      "fall": 0,
+      "lock": 200
+    },
+    {
+      "level": 26,
+      "entry": 30,
+      "fall": 0,
+      "lock": 195
+    },
+    {
+      "level": 27,
+      "entry": 15,
+      "fall": 0,
+      "lock": 184
+    },
+    {
+      "level": 28,
+      "entry": 10,
+      "fall": 0,
+      "lock": 167
+    },
+    {
+      "level": 29,
+      "entry": 5,
+      "fall": 0,
+      "lock": 151
+    },
+    {
+      "level": 30,
+      "entry": 0,
+      "fall": 0,
+      "lock": 150
+    }
+  ]
+}

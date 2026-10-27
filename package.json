@@ -1,8 +1,8 @@
 {
-  "name": "nes-tetris-friends",
+  "name": "tetris-friends",
   "version": "1.0.0",
   "private": true,
-  "description": "A small NES-inspired Tetris game for solo, LAN, and web play.",
+  "description": "Modern falling blocks with verified Tetris.com desktop level timings, solo and multiplayer rooms.",
   "scripts": {
     "start": "node server.js",
     "dev": "npm start",
