@@ -1,4 +1,141 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NES Tetris — Friends</title><link rel="stylesheet" href="style.css?v=4"></head><body>
-<main><header><h1>NES TETRIS</h1><p>Local • LAN • friends</p></header><section class="game"><div class="boardWrap"><canvas id="board" width="300" height="600" aria-label="Tetris board"></canvas><div id="gameStatus">PRESS START</div></div><aside><div class="panel"><b>SCORE</b><strong id="score">000000</strong><b>LINES</b><strong id="lines">000</strong><b>LEVEL</b><strong id="level">00</strong></div><div class="panel"><b>NEXT</b><canvas id="next" width="120" height="100"></canvas></div><button type="button" id="start">START</button><button type="button" id="pause" aria-pressed="false" disabled>PAUSE</button><button type="button" id="settings">SETTINGS</button></aside></section>
-<section id="settingsPanel" class="settings hidden"><h2>CONTROLS</h2><p>Click a control, then press its new key.</p><div id="bindings"><label>Move left <input data-action="left" readonly></label><label>Move right <input data-action="right" readonly></label><label>Soft drop <input data-action="down" readonly></label><label>Rotate clockwise <input data-action="rotateCW" readonly></label><label>Rotate counterclockwise <input data-action="rotateCCW" readonly></label></div><button id="resetKeys">RESET KEYS</button></section>
-<section class="multiplayer"><h2>PLAY WITH FRIENDS</h2><div><input id="name" maxlength="16" placeholder="Your name"><input id="room" maxlength="8" placeholder="Room code" value="TETRIS"><button type="button" id="join">JOIN ROOM</button></div><p id="roomStatus">Solo mode — join a room to show your game to friends.</p><div id="players"></div></section><footer>NES timing: no hold, hard drop, lock delay, or wall kicks. Open Settings to change controls.</footer></main><script src="game.js?v=4"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#07142e" />
+    <meta
+      name="description"
+      content="Classic falling blocks with NES-inspired timing. Play solo or share a room with friends."
+    />
+    <title>NES Tetris — Friends</title>
+    <link rel="stylesheet" href="style.css?v=5" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>NES TETRIS</h1>
+        <p>Classic blocks. Better with friends.</p>
+      </header>
+      <section class="game" aria-label="Game">
+        <div class="boardWrap">
+          <canvas id="board" width="300" height="600" aria-label="Tetris board"
+            >Your browser needs Canvas support to play.</canvas
+          >
+          <div id="gameStatus" role="status">PRESS START</div>
+        </div>
+        <aside>
+          <div class="panel">
+            <b>SCORE</b><strong id="score">000000</strong><b>LINES</b
+            ><strong id="lines">000</strong><b>LEVEL</b
+            ><strong id="level">00</strong>
+          </div>
+          <div class="panel">
+            <b>NEXT</b
+            ><canvas
+              id="next"
+              width="120"
+              height="100"
+              aria-label="Next piece"
+            ></canvas>
+          </div>
+          <button type="button" id="start">START</button>
+          <button type="button" id="pause" aria-pressed="false" disabled>
+            PAUSE
+          </button>
+          <button
+            type="button"
+            id="settings"
+            aria-controls="settingsPanel"
+            aria-expanded="false"
+          >
+            SETTINGS
+          </button>
+        </aside>
+      </section>
+      <div class="touchControls" aria-label="Touch controls">
+        <button type="button" data-touch="left" aria-label="Move left">
+          ←
+        </button>
+        <button
+          type="button"
+          data-touch="rotateCCW"
+          aria-label="Rotate counterclockwise"
+        >
+          ↶
+        </button>
+        <button type="button" data-touch="down" aria-label="Soft drop">
+          ↓
+        </button>
+        <button
+          type="button"
+          data-touch="rotateCW"
+          aria-label="Rotate clockwise"
+        >
+          ↷
+        </button>
+        <button type="button" data-touch="right" aria-label="Move right">
+          →
+        </button>
+      </div>
+      <p class="hint">← → move · ↓ soft drop · Z / X rotate</p>
+      <section id="settingsPanel" class="settings hidden">
+        <h2>CONTROLS</h2>
+        <p>
+          Click a control, then press its new key. Duplicate keys swap bindings.
+        </p>
+        <div id="bindings">
+          <label>Move left <input data-action="left" readonly /></label>
+          <label>Move right <input data-action="right" readonly /></label>
+          <label>Soft drop <input data-action="down" readonly /></label>
+          <label
+            >Rotate clockwise <input data-action="rotateCW" readonly
+          /></label>
+          <label
+            >Rotate counterclockwise <input data-action="rotateCCW" readonly
+          /></label>
+        </div>
+        <button id="resetKeys" type="button">RESET KEYS</button>
+      </section>
+      <section class="multiplayer">
+        <h2>PLAY WITH FRIENDS</h2>
+        <p>Share a room and chase high scores together.</p>
+        <div class="roomControls">
+          <label class="srOnly" for="name">Your name</label
+          ><input
+            id="name"
+            maxlength="16"
+            placeholder="Your name"
+            autocomplete="nickname"
+          />
+          <label class="srOnly" for="room">Room code</label
+          ><input
+            id="room"
+            maxlength="8"
+            placeholder="Room code"
+            value="TETRIS"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button type="button" id="join">JOIN ROOM</button>
+          <button type="button" id="share">COPY LINK</button>
+          <button type="button" id="leave" disabled>LEAVE</button>
+        </div>
+        <p id="roomStatus" role="status">
+          Solo mode — join a room to show your game to friends.
+        </p>
+        <div id="players"></div>
+      </section>
+      <footer>
+        NES-inspired timing: no hold, hard drop, lock delay, or wall kicks.<br />Open
+        Settings to change controls.
+        <a
+          href="https://github.com/JulianAttemptsCoding/tetris-online#references-and-credits"
+          >Source & credits</a
+        >
+      </footer>
+    </main>
+    <script src="game.js?v=5"></script>
+    <script src="multiplayer.js?v=5"></script>
+  </body>
+</html>
