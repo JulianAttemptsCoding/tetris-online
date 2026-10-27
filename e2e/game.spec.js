@@ -217,6 +217,7 @@ test("optional mouse controls position, hold, and hard-drop the piece", async ({
   await page.locator('[data-option="mouse"]').check();
   await page.locator("#settings").click();
   await page.locator("#pause").click();
+  await page.locator("#board").scrollIntoViewIfNeeded();
   const box = await page.locator("#board").boundingBox();
   await page.mouse.move(box.x + box.width * 0.25, box.y + box.height * 0.25);
   expect(
