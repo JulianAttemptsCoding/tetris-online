@@ -6,16 +6,16 @@
     <meta name="theme-color" content="#07142e" />
     <meta
       name="description"
-      content="Classic falling blocks with NES-inspired timing. Play solo or share a room with friends."
+      content="Modern falling blocks with hold, ghost, SRS rotations, and Tetris.com desktop timing. Play solo or with friends."
     />
-    <title>NES Tetris — Friends</title>
-    <link rel="stylesheet" href="style.css?v=5" />
+    <title>Tetris — Friends</title>
+    <link rel="stylesheet" href="style.css?v=6" />
   </head>
   <body>
     <main>
       <header>
-        <h1>NES TETRIS</h1>
-        <p>Classic blocks. Better with friends.</p>
+        <h1>TETRIS FRIENDS</h1>
+        <p>Modern rules. Classic obsession.</p>
       </header>
       <section class="game" aria-label="Game">
         <div class="boardWrap">
@@ -25,25 +25,39 @@
           <div id="gameStatus" role="status">PRESS START</div>
         </div>
         <aside>
-          <div class="panel">
+          <div class="panel stats">
             <b>SCORE</b><strong id="score">000000</strong><b>LINES</b
             ><strong id="lines">000</strong><b>LEVEL</b
-            ><strong id="level">00</strong>
+            ><strong id="level">01</strong>
           </div>
-          <div class="panel">
-            <b>NEXT</b
-            ><canvas
-              id="next"
-              width="120"
-              height="100"
-              aria-label="Next piece"
-            ></canvas>
+          <div class="panel previewPanel">
+            <div>
+              <b>HOLD</b
+              ><canvas
+                id="hold"
+                width="120"
+                height="80"
+                aria-label="Held piece"
+              ></canvas>
+            </div>
+            <div>
+              <b>NEXT</b
+              ><canvas
+                id="next"
+                width="120"
+                height="190"
+                aria-label="Next three pieces"
+              ></canvas>
+            </div>
           </div>
-          <button type="button" id="start">START</button>
-          <button type="button" id="pause" aria-pressed="false" disabled>
-            PAUSE
-          </button>
-          <button
+          <label class="levelPicker"
+            >START LEVEL
+            <select id="startLevel" aria-label="Starting level"></select
+          ></label>
+          <button type="button" id="start">START</button
+          ><button type="button" id="pause" aria-pressed="false" disabled>
+            PAUSE</button
+          ><button
             type="button"
             id="settings"
             aria-controls="settingsPanel"
@@ -53,49 +67,77 @@
           </button>
         </aside>
       </section>
+      <p id="lastClear" role="status"></p>
       <div class="touchControls" aria-label="Touch controls">
-        <button type="button" data-touch="left" aria-label="Move left">
-          ←
-        </button>
-        <button
+        <button type="button" data-touch="hold" aria-label="Hold piece">
+          HOLD</button
+        ><button type="button" data-touch="left" aria-label="Move left">
+          ←</button
+        ><button
           type="button"
           data-touch="rotateCCW"
           aria-label="Rotate counterclockwise"
         >
-          ↶
-        </button>
-        <button type="button" data-touch="down" aria-label="Soft drop">
-          ↓
-        </button>
-        <button
+          ↶</button
+        ><button type="button" data-touch="down" aria-label="Soft drop">
+          ↓</button
+        ><button
           type="button"
           data-touch="rotateCW"
           aria-label="Rotate clockwise"
         >
-          ↷
-        </button>
-        <button type="button" data-touch="right" aria-label="Move right">
-          →
+          ↷</button
+        ><button type="button" data-touch="right" aria-label="Move right">
+          →</button
+        ><button type="button" data-touch="hardDrop" aria-label="Hard drop">
+          DROP
         </button>
       </div>
-      <p class="hint">← → move · ↓ soft drop · Z / X rotate</p>
+      <p class="hint">
+        ← → move · ↑ / Z rotate · ↓ soft drop<br />Space hard drop · C hold ·
+        Esc pause
+      </p>
+      <p class="bestScore">PERSONAL BEST <strong id="best">000000</strong></p>
+      <details class="highScorePanel">
+        <summary>LOCAL HIGH SCORES</summary>
+        <ol id="highScores"></ol>
+      </details>
       <section id="settingsPanel" class="settings hidden">
-        <h2>CONTROLS</h2>
+        <h2>CONTROLS & OPTIONS</h2>
         <p>
           Click a control, then press its new key. Duplicate keys swap bindings.
         </p>
         <div id="bindings">
-          <label>Move left <input data-action="left" readonly /></label>
-          <label>Move right <input data-action="right" readonly /></label>
-          <label>Soft drop <input data-action="down" readonly /></label>
-          <label
-            >Rotate clockwise <input data-action="rotateCW" readonly
-          /></label>
-          <label
-            >Rotate counterclockwise <input data-action="rotateCCW" readonly
-          /></label>
+          <label>Move left <input data-action="left" readonly /></label
+          ><label>Move right <input data-action="right" readonly /></label
+          ><label>Soft drop <input data-action="down" readonly /></label
+          ><label
+            >Rotate clockwise <input data-action="rotateCW" readonly /></label
+          ><label
+            >Rotate counterclockwise
+            <input data-action="rotateCCW" readonly /></label
+          ><label>Hard drop <input data-action="hardDrop" readonly /></label
+          ><label>Hold <input data-action="hold" readonly /></label
+          ><label>Pause <input data-action="pause" readonly /></label>
         </div>
         <button id="resetKeys" type="button">RESET KEYS</button>
+        <div class="options">
+          <label
+            ><input type="checkbox" data-option="ghost" /> Show ghost
+            piece</label
+          ><label><input type="checkbox" data-option="grid" /> Show grid</label
+          ><label
+            ><input type="checkbox" data-option="sound" /> Sound effects</label
+          ><label><input type="checkbox" data-option="music" /> Music</label
+          ><label
+            ><input type="checkbox" data-option="mouse" /> Mouse controls</label
+          >
+        </div>
+        <p>
+          Mouse: move to position · left click drops · right click holds · wheel
+          rotates.
+        </p>
+        <button id="fullscreen" type="button">FULLSCREEN (F4)</button>
       </section>
       <section class="multiplayer">
         <h2>PLAY WITH FRIENDS</h2>
@@ -107,8 +149,7 @@
             maxlength="16"
             placeholder="Your name"
             autocomplete="nickname"
-          />
-          <label class="srOnly" for="room">Room code</label
+          /><label class="srOnly" for="room">Room code</label
           ><input
             id="room"
             maxlength="8"
@@ -116,10 +157,9 @@
             value="TETRIS"
             autocomplete="off"
             spellcheck="false"
-          />
-          <button type="button" id="join">JOIN ROOM</button>
-          <button type="button" id="share">COPY LINK</button>
-          <button type="button" id="leave" disabled>LEAVE</button>
+          /><button type="button" id="join">JOIN ROOM</button
+          ><button type="button" id="share">COPY LINK</button
+          ><button type="button" id="leave" disabled>LEAVE</button>
         </div>
         <p id="roomStatus" role="status">
           Solo mode — join a room to show your game to friends.
@@ -127,15 +167,15 @@
         <div id="players"></div>
       </section>
       <footer>
-        NES-inspired timing: no hold, hard drop, lock delay, or wall kicks.<br />Open
-        Settings to change controls.
-        <a
-          href="https://github.com/JulianAttemptsCoding/tetris-online#references-and-credits"
-          >Source & credits</a
+        Modern Marathon · hold · ghost · SRS · seven-piece bags.<br /><a
+          href="https://github.com/JulianAttemptsCoding/tetris-online/blob/main/RULES.md"
+          >Rules, timing & verification</a
         >
+        · Independent fan project.
       </footer>
     </main>
-    <script src="game.js?v=5"></script>
-    <script src="multiplayer.js?v=5"></script>
+    <script src="engine.js?v=6"></script>
+    <script src="game.js?v=6"></script>
+    <script src="multiplayer.js?v=6"></script>
   </body>
 </html>
