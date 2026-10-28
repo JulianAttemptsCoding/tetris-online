@@ -8,6 +8,33 @@ Features include hold, three next previews, ghost projection, seven-piece bags, 
 
 **Verified timing tables, sources, tests, and remaining parity limits: [RULES.md](RULES.md).** Numerical keyboard timing and level settings were read from the actual official desktop build; exhaustive equivalence with its smart mouse behavior and rendering is not claimed.
 
+## For reviewers
+
+**What's interesting.** The engine ([`public/engine.js`](public/engine.js)) is written from scratch to
+match a reference game's *measured* behaviour, not just its rules. I recorded the official desktop
+build's timing parameters per level (gravity, entry delay, lock delay, DAS/ARR) in
+[`test/fixtures/tetris-com-timing.json`](test/fixtures/tetris-com-timing.json), and the tests check the
+engine against them level by level. [RULES.md](RULES.md) lists every value, where it came from, and the
+remaining known differences.
+
+```bash
+npm ci
+npm test          # 116 tests: timing at every level, SRS kicks, 7-bag, hold, scoring, T-spins, server
+npm run test:e2e  # Playwright: real browser games, multiplayer room join/leave
+```
+
+**Multiplayer** ([`server.js`](server.js)) is a Socket.IO relay, not an authoritative game server:
+
+- **Rooms:** capped at 8 players.
+- **Validation:** boards must have the right shape (`validBoard`) and scores must be non-negative
+  integers.
+- **Rate limit:** each client can send a state update at most once every 80 ms.
+- **Cleanup:** disconnected players are removed.
+
+It stops malformed or flooding clients, not a determined cheater. The README calls rooms "casual" for
+that reason. The GitHub Pages build uses peer-to-peer WebRTC (Trystero over Nostr signalling) instead
+of the server.
+
 ## Run
 
 Node.js 22 or newer:
